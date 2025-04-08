@@ -10,8 +10,8 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 function generateFloor() {
     // TEXTURES
     const textureLoader = new THREE.TextureLoader();
-    // const placeholder = textureLoader.load("../public/textures/placeholder.png");
-    const placeholder = textureLoader.load("../public/textures/grass.png");
+    // const placeholder = textureLoader.load("../textures/placeholder.png");
+    const placeholder = textureLoader.load("../textures/grass.png");
 
 
     const WIDTH = 200
@@ -70,12 +70,12 @@ async function init() {
     // Carregando as texturas
     const Textureloader = new THREE.TextureLoader();
     const textures = {
-        'top': Textureloader.load('../public/textures/sky_pieces/Top.bmp'),
-        'right': Textureloader.load('../public/textures/sky_pieces/Right.bmp'),
-        'back': Textureloader.load('../public/textures/sky_pieces/Back.bmp'),
-        'left': Textureloader.load('../public/textures/sky_pieces/Left.bmp'),
-        'front': Textureloader.load('../public/textures/sky_pieces/Front.bmp'),
-        'bottom': Textureloader.load('../public/textures/sky_pieces/Bottom.bmp')
+        'top': Textureloader.load('../textures/sky_pieces/Top.bmp'),
+        'right': Textureloader.load('../textures/sky_pieces/Right.bmp'),
+        'back': Textureloader.load('../textures/sky_pieces/Back.bmp'),
+        'left': Textureloader.load('../textures/sky_pieces/Left.bmp'),
+        'front': Textureloader.load('../textures/sky_pieces/Front.bmp'),
+        'bottom': Textureloader.load('../textures/sky_pieces/Bottom.bmp')
     };
 
     // Aplica as texturas a cada face do cubo
