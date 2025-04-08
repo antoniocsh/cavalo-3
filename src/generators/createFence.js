@@ -41,7 +41,7 @@ export function createFence(x = 0, z = 0, orientation = 1) {
 
 function createVerticalPart(width, height){
     const textureLoader = new THREE.TextureLoader();
-    const woodVerticalTexture = textureLoader.load('../textures/wood.jpg');
+    const woodVerticalTexture = textureLoader.load('textures/wood.jpg');
     woodVerticalTexture.wrapS = THREE.RepeatWrapping;
     woodVerticalTexture.wrapT = THREE.RepeatWrapping;
     woodVerticalTexture.repeat.set(width, height);
@@ -57,7 +57,7 @@ function createVerticalPart(width, height){
 function createHorizontalPart(width, height, orientation = 0){
     const textureLoader = new THREE.TextureLoader();
 
-    const woodHorizontalTexture = textureLoader.load('../textures/wood2.jpg');
+    const woodHorizontalTexture = textureLoader.load('textures/wood2.jpg');
     woodHorizontalTexture.wrapS = THREE.RepeatWrapping;
     woodHorizontalTexture.wrapT = THREE.RepeatWrapping;
     woodHorizontalTexture.repeat.set(width, height);

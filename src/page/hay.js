@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 function createHayBlock(width = 1, height = 1, depth = 1, x = 0, y = 0, z = 0) {
     // Load texture
     const textureLoader = new THREE.TextureLoader();
-    const hayTexture = textureLoader.load('../statictextures/hay.jpg');
+    const hayTexture = textureLoader.load('textures/hay.jpg');
     
     // Repeat texture instead of stretching
     hayTexture.wrapS = THREE.RepeatWrapping;
