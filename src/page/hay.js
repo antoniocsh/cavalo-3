@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 function createHayBlock(width = 1, height = 1, depth = 1, x = 0, y = 0, z = 0) {
     // Load texture
     const textureLoader = new THREE.TextureLoader();
-    const hayTexture = textureLoader.load('../static/textures/hay.jpg');
+    const hayTexture = textureLoader.load('../statictextures/hay.jpg');
     
     // Repeat texture instead of stretching
     hayTexture.wrapS = THREE.RepeatWrapping;
@@ -28,7 +28,7 @@ function createHayBlock(width = 1, height = 1, depth = 1, x = 0, y = 0, z = 0) {
 
 function loadHorseModel(scene, x = 0, y = 0, z = 0, scale = 1) {
     const loader = new GLTFLoader();
-    loader.load('../static/models/low poly horse.gbl', (gltf) => {
+    loader.load('../staticmodels/low poly horse.gbl', (gltf) => {
         const horse = gltf.scene;
         horse.position.set(x, y, z);
         horse.scale.set(scale, scale, scale);

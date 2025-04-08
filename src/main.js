@@ -10,8 +10,8 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 function generateFloor() {
     // TEXTURES
     const textureLoader = new THREE.TextureLoader();
-    // const placeholder = textureLoader.load("/textures/placeholder.png");
-    const placeholder = textureLoader.load("/textures/grass.png");
+    // const placeholder = textureLoader.load("textures/placeholder.png");
+    const placeholder = textureLoader.load("textures/grass.png");
 
 
     const WIDTH = 200
@@ -70,12 +70,12 @@ async function init() {
     // Carregando as texturas
     const Textureloader = new THREE.TextureLoader();
     const textures = {
-        'top': Textureloader.load('/textures/sky_pieces/Top.bmp'),
-        'right': Textureloader.load('/textures/sky_pieces/Right.bmp'),
-        'back': Textureloader.load('/textures/sky_pieces/Back.bmp'),
-        'left': Textureloader.load('/textures/sky_pieces/Left.bmp'),
-        'front': Textureloader.load('/textures/sky_pieces/Front.bmp'),
-        'bottom': Textureloader.load('/textures/sky_pieces/Bottom.bmp')
+        'top': Textureloader.load('textures/sky_pieces/Top.bmp'),
+        'right': Textureloader.load('textures/sky_pieces/Right.bmp'),
+        'back': Textureloader.load('textures/sky_pieces/Back.bmp'),
+        'left': Textureloader.load('textures/sky_pieces/Left.bmp'),
+        'front': Textureloader.load('textures/sky_pieces/Front.bmp'),
+        'bottom': Textureloader.load('textures/sky_pieces/Bottom.bmp')
     };
 
     // Aplica as texturas a cada face do cubo
@@ -130,7 +130,7 @@ async function init() {
     let myHorseCamera;
 
     const loader = new GLTFLoader();
-    loader.load('/models/horse.glb', (gltf) => {
+    loader.load('models/horse.glb', (gltf) => {
         myHorse = new THREE.Object3D(); // Wrapper
         const horseModel = gltf.scene;
         horseModel.scale.set(0.1, 0.1, 0.1);
@@ -151,7 +151,7 @@ async function init() {
 
     let bot1;
 
-    loader.load('/models/horse.glb', (gltf) => {
+    loader.load('models/horse.glb', (gltf) => {
         bot1 = gltf.scene;
         bot1.scale.set(0.1, 0.1, 0.1);
         bot1.position.set(0, -20, 0);
@@ -160,7 +160,7 @@ async function init() {
 
     let bot2;
 
-    loader.load('/models/horse.glb', (gltf) => {
+    loader.load('models/horse.glb', (gltf) => {
         bot2 = gltf.scene;
         bot2.scale.set(0.1, 0.1, 0.1);
         bot2.position.set(0, -20, 0);
@@ -169,7 +169,7 @@ async function init() {
 
     let bot3;
 
-    loader.load('/models/horse.glb', (gltf) => {
+    loader.load('models/horse.glb', (gltf) => {
         bot3 = gltf.scene;
         bot3.scale.set(0.1, 0.1, 0.1);
         bot3.position.set(0, -20, 0);

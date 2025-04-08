@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 export function createHayBlock(width = 1, height = 1, depth = 1, x = 0, y = 0, z = 0) {
     const textureLoader = new THREE.TextureLoader();
-    const hayTexture = textureLoader.load('..//textures/hay.jpg');
+    const hayTexture = textureLoader.load('../textures/hay.jpg');
     hayTexture.wrapS = THREE.RepeatWrapping;
     hayTexture.wrapT = THREE.RepeatWrapping;
     hayTexture.repeat.set(width, height);
