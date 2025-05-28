@@ -276,7 +276,7 @@ async function init() {
     }
 
     // Botão para alternar câmeras e estado do ponteiro
-    const toggleCamButton = document.createElement('toggleCamButton');
+    const toggleCamButton = document.createElement('button');
     toggleCamButton.textContent = 'Alternar Câmera';
     toggleCamButton.style.position = 'absolute';
     toggleCamButton.style.top = '10px';
@@ -366,7 +366,6 @@ async function init() {
             document.exitPointerLock();
             scene.remove(lobby);
             scene.add(raceAssets);
-    
             startRaceButton.remove();
             startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
         }

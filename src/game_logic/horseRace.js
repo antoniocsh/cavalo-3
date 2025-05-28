@@ -7,6 +7,7 @@ let myHorseAccel = 1;
 export async function startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z) {
     // Iniciar posições
     createMoreSpeedButton();
+    createWOWButton();
     RACEPOSITION_Z += 5;
     const end = -RACEPOSITION_Z;
     bot1.position.set(RACEPOSITION_X + 3.5, 0.2, RACEPOSITION_Z);
@@ -117,6 +118,26 @@ function game321Counter() {
 
     updateCountdown();
 }
+
+function createWOWButton() {
+    const wowButton = document.createElement('button');
+    wowButton.textContent = 'WOW';
+    wowButton.style.position = 'absolute';
+    wowButton.style.top = '100px';
+    wowButton.style.left = '10px';
+    wowButton.style.padding = '10px';
+    wowButton.style.background = 'black';
+    wowButton.style.color = 'white';
+    wowButton.style.border = 'none';
+    wowButton.style.cursor = 'pointer';
+
+
+    wowButton.onclick = () => {
+        alert('WOW! Você clicou no botão!');
+    };
+    document.body.appendChild(wowButton);
+}
+        
 
 function createMoreSpeedButton() {
     const morespeedButton = document.createElement('button');
