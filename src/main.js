@@ -14,8 +14,8 @@ function generateFloor() {
     const placeholder = textureLoader.load("textures/grass.png");
 
 
-    const WIDTH = 200
-    const LENGTH = 200
+    const WIDTH = 700;
+    const LENGTH = 700;
 
     const geometry = new THREE.PlaneGeometry(WIDTH, LENGTH, 512, 512);
     const material = new THREE.MeshStandardMaterial(
@@ -35,7 +35,7 @@ function generateFloor() {
 
 function wrapAndRepeatTexture(map) {
     map.wrapS = map.wrapT = THREE.RepeatWrapping
-    map.repeat.x = map.repeat.y = 50
+    map.repeat.x = map.repeat.y = 250
 }
 
 
@@ -55,17 +55,25 @@ function wrapAndRepeatTexture(map) {
 async function init() {
     const FENCE_WIDTH = 15;
     const FENCE_LENGTH = 15;
+    const SKYBOX = 700;
+    const RACEPOSITION_X = 50;
+    const RACEPOSITION_Z = -250;
+
     const scene = new THREE.Scene();
 
 
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
     document.body.appendChild(renderer.domElement);
+    
 
 
 
-    const geometry = new THREE.BoxGeometry(400, 400, 400);
+    const geometry = new THREE.BoxGeometry(SKYBOX, SKYBOX, SKYBOX);
 
     // Carregando as texturas
     const Textureloader = new THREE.TextureLoader();
@@ -91,7 +99,7 @@ async function init() {
     const cube = new THREE.Mesh(geometry, materials);
     scene.add(cube);
 
-    const lobby = await createLobby(FENCE_WIDTH, FENCE_LENGTH);
+    const lobby = await createLobby(FENCE_WIDTH, FENCE_LENGTH,RACEPOSITION_X, RACEPOSITION_Z);
     scene.add(lobby);
 
 
@@ -107,14 +115,16 @@ async function init() {
     // light.position.set(10, 10, 10);
     // scene.add(light);
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5); // Luz ambiente suave
-    hemiLight.position.set(0, 50, 0);
-    scene.add(hemiLight);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight.position.set(10, 20, 10);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1); // Luz direcional suave
-    dirLight.position.set(10, 20, 10);
-    dirLight.castShadow = true;
-    scene.add(dirLight);
+    
+    
 
 
     const axes = new THREE.AxesHelper(15);
@@ -140,7 +150,7 @@ async function init() {
         myHorse.add(horseModel);
 
         // Create and attach a perspective camera
-        myHorseCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 400);
+        myHorseCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, SKYBOX);
         myHorseCamera.position.set(0, 6, 0); // Adjust to be slightly above & behind the horse
         myHorseCamera.lookAt(horseModel.position.clone().add(new THREE.Vector3(0, 5, 5))); // Face forward
 
@@ -182,11 +192,11 @@ async function init() {
     // scene.add(tower);
 
     // Câmera em primeira pessoa
-    const FPCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 400);
+    const FPCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX+100);
     FPCamera.position.set(0, 4, 15);
 
     // Câmera de cena com OrbitControls
-    const SceneCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 400);
+    const SceneCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX+100);
     SceneCamera.position.set(10, 10, 20);
     const orbitControls = new OrbitControls(SceneCamera, document.body);
     orbitControls.enableDamping = true;
@@ -320,8 +330,11 @@ async function init() {
         isMyHorseBusy = true;
         activeCamera = myHorseCamera; // Switch to horse camera
         document.exitPointerLock(); // Exit pointer lock mode
+        // Destroy THE STARTRACEBUTTON
+        startRaceButton.remove();
 
-        startRace(myHorse, bot1, bot2, bot3);
+        startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
+
     };
 
     document.body.appendChild(startRaceButton);
