@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { createLobby } from './generators/createLobby.js';
 import { startRace } from './game_logic/horseRace.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { createRaceAssets } from './generators/createRaceAssets.js';
 
 
 
@@ -66,10 +67,10 @@ async function init() {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     document.body.appendChild(renderer.domElement);
-    
+
 
 
 
@@ -88,28 +89,28 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     // Aplica as texturas a cada face do cubo
     const materials = [
-        new THREE.MeshBasicMaterial({ map: textures.right, side: THREE.BackSide, depthTest: false  }), // Front face
-        new THREE.MeshBasicMaterial({ map: textures.left, side: THREE.BackSide, depthTest: false  }),  // Back face
-        new THREE.MeshBasicMaterial({ map: textures.top, side: THREE.BackSide, depthTest: false  }),  // Top face
-        new THREE.MeshBasicMaterial({ map: textures.bottom, side: THREE.BackSide, depthTest: false  }), // Bottom face
-        new THREE.MeshBasicMaterial({ map: textures.front, side: THREE.BackSide, depthTest: false  }),  // Left face
-        new THREE.MeshBasicMaterial({ map: textures.back, side: THREE.BackSide, depthTest: false  })  // Right face
+        new THREE.MeshBasicMaterial({ map: textures.right, side: THREE.BackSide, depthTest: false }), // Front face
+        new THREE.MeshBasicMaterial({ map: textures.left, side: THREE.BackSide, depthTest: false }),  // Back face
+        new THREE.MeshBasicMaterial({ map: textures.top, side: THREE.BackSide, depthTest: false }),  // Top face
+        new THREE.MeshBasicMaterial({ map: textures.bottom, side: THREE.BackSide, depthTest: false }), // Bottom face
+        new THREE.MeshBasicMaterial({ map: textures.front, side: THREE.BackSide, depthTest: false }),  // Left face
+        new THREE.MeshBasicMaterial({ map: textures.back, side: THREE.BackSide, depthTest: false })  // Right face
     ];
 
-    const cube = new THREE.Mesh(geometry, materials);
-    scene.add(cube);
+    const skycube = new THREE.Mesh(geometry, materials);
+    scene.add(skycube);
 
-    const lobby = await createLobby(FENCE_WIDTH, FENCE_LENGTH,RACEPOSITION_X, RACEPOSITION_Z);
+    const lobby = await createLobby(FENCE_WIDTH, FENCE_LENGTH);
     scene.add(lobby);
 
-
+    const raceAssets = await createRaceAssets(RACEPOSITION_X, RACEPOSITION_Z);
 
     // const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0));
     // const planeHelper = new THREE.PlaneHelper(plane, 200, 0x00ff00);
     // scene.add(planeHelper);
 
     scene.add(generateFloor());
-    
+
 
     // const light = new THREE.DirectionalLight(0xffffff, 6);
     // light.position.set(10, 10, 10);
@@ -117,14 +118,14 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
-    
+
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
     directionalLight.position.set(10, 20, 10);
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    
-    
+
+
 
 
     const axes = new THREE.AxesHelper(15);
@@ -192,11 +193,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     // scene.add(tower);
 
     // Câmera em primeira pessoa
-    const FPCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX+100);
+    const FPCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX + 100);
     FPCamera.position.set(0, 4, 15);
 
     // Câmera de cena com OrbitControls
-    const SceneCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX+100);
+    const SceneCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX + 100);
     SceneCamera.position.set(10, 10, 20);
     const orbitControls = new OrbitControls(SceneCamera, document.body);
     orbitControls.enableDamping = true;
@@ -312,8 +313,36 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     // };
     // document.body.appendChild(morespeedButton);
 
-    const startRaceButton = document.createElement('startRaceButton');
-    startRaceButton.textContent = 'Começar Corrida';
+    // const startRaceButton = document.createElement('startRaceButton');
+    // startRaceButton.textContent = 'Começar Corrida';
+    // startRaceButton.style.position = 'absolute';
+    // startRaceButton.style.top = '50px';
+    // startRaceButton.style.left = '10px';
+    // startRaceButton.style.padding = '10px';
+    // startRaceButton.style.background = 'red';
+    // startRaceButton.style.color = 'white';
+    // startRaceButton.style.border = 'none';
+    // startRaceButton.style.cursor = 'pointer';
+    // startRaceButton.onclick = () => {
+    //     myHorse.rotation.y = 0;
+    //     myHorseCircle = 0;
+    //     isMyHorseBusy = true;
+    //     activeCamera = myHorseCamera; // Switch to horse camera
+    //     document.exitPointerLock(); // Exit pointer lock mode
+    //     scene.remove(lobby);
+    //     scene.add(raceAssets);
+
+    //     startRaceButton.remove();
+    //     startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
+
+
+
+
+    // };
+
+    // document.body.appendChild(startRaceButton);
+    const startRaceButton = document.createElement('div');
+    startRaceButton.textContent = 'C - Começar Corrida';
     startRaceButton.style.position = 'absolute';
     startRaceButton.style.top = '50px';
     startRaceButton.style.left = '10px';
@@ -321,23 +350,47 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     startRaceButton.style.background = 'red';
     startRaceButton.style.color = 'white';
     startRaceButton.style.border = 'none';
-    startRaceButton.style.cursor = 'pointer';
-    startRaceButton.onclick = () => {
-        myHorse.rotation.y = 0;
-
-        myHorseCircle = 0;
-
-        isMyHorseBusy = true;
-        activeCamera = myHorseCamera; // Switch to horse camera
-        document.exitPointerLock(); // Exit pointer lock mode
-        // Destroy THE STARTRACEBUTTON
-        startRaceButton.remove();
-
-        startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
-
-    };
-
+    startRaceButton.style.borderRadius = '8px';
+    startRaceButton.style.cursor = 'default';
+    startRaceButton.style.fontFamily = 'sans-serif';
     document.body.appendChild(startRaceButton);
+
+    document.addEventListener('keydown', (event) => {
+        keys[event.key.toLowerCase()] = true;
+    
+        if (event.key.toLowerCase() === 'c' && !isMyHorseBusy) {
+            myHorse.rotation.y = 0;
+            myHorseCircle = 0;
+            isMyHorseBusy = true;
+            activeCamera = myHorseCamera;
+            document.exitPointerLock();
+            scene.remove(lobby);
+            scene.add(raceAssets);
+    
+            startRaceButton.remove();
+            startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
+        }
+    });
+    
+
+
+    window.addEventListener('raceEnded', () => {
+        scene.remove(raceAssets);
+        scene.add(lobby);
+
+        isMyHorseBusy = false;
+        myHorse.position.set(0, 0, 0);
+        myHorse.rotation.set(0, 0, 0);
+        bot1.position.set(0, -20, 0);
+        bot2.position.set(0, -20, 0);
+        bot3.position.set(0, -20, 0);
+        myHorseCircle = 0;
+        activeCamera = FPCamera;
+
+        // Show race start button again
+        document.body.appendChild(startRaceButton);
+    });
+
 
     animate();
 }

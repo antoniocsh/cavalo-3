@@ -1,18 +1,18 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
 
-let animationFrameId; 
+let animationFrameId;
 let myHorseAccel = 1;
 
 export async function startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z) {
     // Iniciar posições
     createMoreSpeedButton();
-    RACEPOSITION_Z +=5;
+    RACEPOSITION_Z += 5;
     const end = -RACEPOSITION_Z;
-    bot1.position.set(RACEPOSITION_X+5, 0.2, RACEPOSITION_Z);
-    myHorse.position.set(RACEPOSITION_X+10, 0.2, RACEPOSITION_Z);
-    bot2.position.set(RACEPOSITION_X+15, 0.2, RACEPOSITION_Z);
-    bot3.position.set(RACEPOSITION_X+20, 0.2, RACEPOSITION_Z);
+    bot1.position.set(RACEPOSITION_X + 3.5, 0.2, RACEPOSITION_Z);
+    myHorse.position.set(RACEPOSITION_X + 10, 0.2, RACEPOSITION_Z);
+    bot2.position.set(RACEPOSITION_X + 16, 0.2, RACEPOSITION_Z);
+    bot3.position.set(RACEPOSITION_X + 22.5, 0.2, RACEPOSITION_Z);
 
     // Contagem decrescente
     game321Counter();
@@ -36,7 +36,7 @@ export async function startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEP
     }
 
     // Inicia a animação da corrida
-    animationFrameId = requestAnimationFrame((time) => 
+    animationFrameId = requestAnimationFrame((time) =>
         animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1velocity, bot2velocity, bot3velocity, bot1Acceleration, bot2Acceleration, bot3Acceleration, time, end)
     );
 }
@@ -54,7 +54,7 @@ function animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1veloc
     bot2.position.z += bot2velocity * deltaTime;
     bot3.position.z += bot3velocity * deltaTime;
     myHorse.position.z += myHorseVelocity * deltaTime;
-    
+
     // Atualiza a velocidade multiplicando pela aceleração
     bot1velocity *= Math.pow(bot1Acceleration, deltaTime);
     bot2velocity *= Math.pow(bot2Acceleration, deltaTime);
@@ -65,7 +65,7 @@ function animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1veloc
     if (bot1.position.z >= end || bot2.position.z >= end || bot3.position.z >= end || myHorse.position.z >= end) {
         let winner = '';
         if (myHorse.position.z >= end) {
-            winner = 'Você';
+            winner = 'player';
         } else if (bot1.position.z >= end) {
             winner = 'Bot 1';
         } else if (bot2.position.z >= end) {
@@ -73,7 +73,7 @@ function animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1veloc
         } else if (bot3.position.z >= end) {
             winner = 'Bot 3';
         }
-        cancelAnimationFrame(animationFrameId); 
+        cancelAnimationFrame(animationFrameId);
         console.log('Corrida terminada!');
         myHorseAccel = 1;
         destroyMoreSPeedButton();
@@ -82,7 +82,7 @@ function animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1veloc
     }
 
     // Solicita o próximo quadro de animação
-    animationFrameId = requestAnimationFrame((newTime) => 
+    animationFrameId = requestAnimationFrame((newTime) =>
         animateRace(newTime, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1velocity, bot2velocity, bot3velocity, bot1Acceleration, bot2Acceleration, bot3Acceleration, time, end)
     );
 }
@@ -111,7 +111,7 @@ function game321Counter() {
             index++;
             setTimeout(updateCountdown, 1000);
         } else {
-            document.body.removeChild(countdownElement); // Remove a contagem após o "START!"
+            document.body.removeChild(countdownElement);
         }
     }
 
@@ -130,15 +130,15 @@ function createMoreSpeedButton() {
     morespeedButton.style.border = 'none';
     morespeedButton.style.cursor = 'pointer';
     morespeedButton.onclick = () => {
-        if (myHorseAccel <= 1.5){myHorseAccel += 0.0066}
-        else if (myHorseAccel <= 2) {myHorseAccel += 0.0033}
-        else{myHorseAccel += 0.0001}
+        if (myHorseAccel <= 1.5) { myHorseAccel += 0.0066 }
+        else if (myHorseAccel <= 2) { myHorseAccel += 0.0033 }
+        else { myHorseAccel += 0.0001 }
     };
     document.body.appendChild(morespeedButton);
 }
 
 
-function destroyMoreSPeedButton(){
+function destroyMoreSPeedButton() {
     const button = document.querySelector('button');
     if (button) {
         document.body.removeChild(button);
@@ -146,9 +146,10 @@ function destroyMoreSPeedButton(){
 }
 
 function endRace(winner) {
+    // Mensagem de fim da corrida
     const endMessage = document.createElement('div');
     endMessage.style.position = 'absolute';
-    endMessage.style.top = '50%';
+    endMessage.style.top = '40%';
     endMessage.style.left = '50%';
     endMessage.style.transform = 'translate(-50%, -50%)';
     endMessage.style.fontSize = '48px';
@@ -158,25 +159,34 @@ function endRace(winner) {
     endMessage.style.padding = '20px';
     endMessage.style.borderRadius = '10px';
     endMessage.style.textAlign = 'center';
-    endMessage.textContent = `O vencedor é: ${winner}!`;
+    if (winner === 'player') {
+        endMessage.textContent = '🏁 PARABÉNS! VENCESTE! 🏆';
+    }
+    else{endMessage.textContent = `🏁 Vencedor: ${winner}!`;}
     document.body.appendChild(endMessage);
-    // Adicione um botão para voltar para o inicio
-    const restartButton = document.createElement('button');
-    restartButton.textContent = 'Voltar para o início';
-    restartButton.style.position = 'absolute';
-    restartButton.style.top = '60%';
-    restartButton.style.left = '50%';
-    restartButton.style.transform = 'translate(-50%, -50%)';
-    restartButton.style.padding = '10px';
-    restartButton.style.background = 'black';
-    restartButton.style.color = 'white';
-    restartButton.style.border = 'none';
-    restartButton.style.cursor = 'pointer';
-    restartButton.onclick = () => {
+
+    // Botão para voltar ao lobby
+    const returnButton = document.createElement('button');
+    returnButton.textContent = 'Voltar ao Lobby';
+    returnButton.style.position = 'absolute';
+    returnButton.style.top = '60%';
+    returnButton.style.left = '50%';
+    returnButton.style.transform = 'translate(-50%, -50%)';
+    returnButton.style.fontSize = '24px';
+    returnButton.style.padding = '10px 20px';
+    returnButton.style.background = '#4CAF50';
+    returnButton.style.color = 'white';
+    returnButton.style.border = 'none';
+    returnButton.style.borderRadius = '8px';
+    returnButton.style.cursor = 'pointer';
+
+    returnButton.onclick = () => {
         document.body.removeChild(endMessage);
-        document.body.removeChild(restartButton);
-        window.location.reload(); // Simplesmente recarrega a página para reiniciar o jogo
-        
+        document.body.removeChild(returnButton);
+
+        const event = new Event('raceEnded');
+        window.dispatchEvent(event);
     };
-    document.body.appendChild(restartButton);
+
+    document.body.appendChild(returnButton);
 }
