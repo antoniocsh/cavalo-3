@@ -4,10 +4,40 @@ import * as THREE from 'three';
 let animationFrameId;
 let myHorseAccel = 1;
 
+// Listener para barra de espaço (sempre ativo)
+function handleSpaceKey(event) {
+    if (event.code === 'Space') {
+        if (myHorseAccel <= 1.5) {
+            myHorseAccel += 0.0066;
+        } else if (myHorseAccel <= 2) {
+            myHorseAccel += 0.0033;
+        } else {
+            myHorseAccel += 0.0001;
+        }
+        event.preventDefault();
+    }
+}
+window.addEventListener('keydown', handleSpaceKey);
+
+// Listener para a tecla Q (apenas após a corrida acabar)
+function handleQKey(event) {
+    if (event.key.toLowerCase() === 'q') {
+        const endMessage = document.querySelector('div[style*="top: 40%"]');
+        if (endMessage) document.body.removeChild(endMessage);
+        const returnButton = document.getElementById('returnButton');
+        if (returnButton) document.body.removeChild(returnButton);
+
+        destroyMoreSPeedButton();
+
+        const eventLobby = new Event('raceEnded');
+        window.dispatchEvent(eventLobby);
+
+        window.removeEventListener('keydown', handleQKey);
+    }
+}
+
 export async function startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z) {
-    // Iniciar posições
     createMoreSpeedButton();
-    createWOWButton();
     RACEPOSITION_Z += 5;
     const end = -RACEPOSITION_Z;
     bot1.position.set(RACEPOSITION_X + 3.5, 0.2, RACEPOSITION_Z);
@@ -15,28 +45,23 @@ export async function startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEP
     bot2.position.set(RACEPOSITION_X + 16, 0.2, RACEPOSITION_Z);
     bot3.position.set(RACEPOSITION_X + 22.5, 0.2, RACEPOSITION_Z);
 
-    // Contagem decrescente
     game321Counter();
-    myHorseAccel = 1
+    myHorseAccel = 1;
     let myHorseVelocity = 0.1;
     let bot1velocity = 0.1;
     let bot2velocity = 0.1;
     let bot3velocity = 0.1;
 
-    // Velocidade inicial dos bots
     let bot1Acceleration = 1.2;
     let bot2Acceleration = 1.4;
     let bot3Acceleration = 1.1;
 
-    // Aguardar a contagem regressiva
     await sleep(4000);
 
-    // Cancelar qualquer animação anterior antes de iniciar uma nova
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
     }
 
-    // Inicia a animação da corrida
     animationFrameId = requestAnimationFrame((time) =>
         animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1velocity, bot2velocity, bot3velocity, bot1Acceleration, bot2Acceleration, bot3Acceleration, time, end)
     );
@@ -47,22 +72,18 @@ function sleep(ms) {
 }
 
 function animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1velocity, bot2velocity, bot3velocity, bot1Acceleration, bot2Acceleration, bot3Acceleration, lastTime, end) {
-    // A cada quadro, calculamos o tempo decorrido
-    const deltaTime = (time - lastTime) / 1000;  // Tempo em segundos
+    const deltaTime = (time - lastTime) / 1000;
 
-    // Incrementa a posição Z dos cavalos de acordo com a sua velocidade
     bot1.position.z += bot1velocity * deltaTime;
     bot2.position.z += bot2velocity * deltaTime;
     bot3.position.z += bot3velocity * deltaTime;
     myHorse.position.z += myHorseVelocity * deltaTime;
 
-    // Atualiza a velocidade multiplicando pela aceleração
     bot1velocity *= Math.pow(bot1Acceleration, deltaTime);
     bot2velocity *= Math.pow(bot2Acceleration, deltaTime);
     bot3velocity *= Math.pow(bot3Acceleration, deltaTime);
     myHorseVelocity *= Math.pow(myHorseAccel, deltaTime);
 
-    // Verifica se algum cavalo ultrapassou a linha de chegada (por exemplo, 200)
     if (bot1.position.z >= end || bot2.position.z >= end || bot3.position.z >= end || myHorse.position.z >= end) {
         let winner = '';
         if (myHorse.position.z >= end) {
@@ -82,7 +103,6 @@ function animateRace(time, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1veloc
         return;
     }
 
-    // Solicita o próximo quadro de animação
     animationFrameId = requestAnimationFrame((newTime) =>
         animateRace(newTime, myHorse, bot1, bot2, bot3, myHorseVelocity, bot1velocity, bot2velocity, bot3velocity, bot1Acceleration, bot2Acceleration, bot3Acceleration, time, end)
     );
@@ -119,29 +139,10 @@ function game321Counter() {
     updateCountdown();
 }
 
-function createWOWButton() {
-    const wowButton = document.createElement('button');
-    wowButton.textContent = 'WOW';
-    wowButton.style.position = 'absolute';
-    wowButton.style.top = '100px';
-    wowButton.style.left = '10px';
-    wowButton.style.padding = '10px';
-    wowButton.style.background = 'black';
-    wowButton.style.color = 'white';
-    wowButton.style.border = 'none';
-    wowButton.style.cursor = 'pointer';
-
-
-    wowButton.onclick = () => {
-        alert('WOW! Você clicou no botão!');
-    };
-    document.body.appendChild(wowButton);
-}
-        
-
 function createMoreSpeedButton() {
     const morespeedButton = document.createElement('button');
-    morespeedButton.textContent = 'MAIS RÁPIDO';
+    morespeedButton.id = 'moreSpeedButton';
+    morespeedButton.textContent = 'MAIS RÁPIDO (SPACE)';
     morespeedButton.style.position = 'absolute';
     morespeedButton.style.top = '10px';
     morespeedButton.style.right = '10px';
@@ -149,6 +150,7 @@ function createMoreSpeedButton() {
     morespeedButton.style.background = 'black';
     morespeedButton.style.color = 'white';
     morespeedButton.style.border = 'none';
+    morespeedButton.style.borderRadius = '8px';
     morespeedButton.style.cursor = 'pointer';
     morespeedButton.onclick = () => {
         if (myHorseAccel <= 1.5) { myHorseAccel += 0.0066 }
@@ -158,9 +160,8 @@ function createMoreSpeedButton() {
     document.body.appendChild(morespeedButton);
 }
 
-
 function destroyMoreSPeedButton() {
-    const button = document.querySelector('button');
+    const button = document.getElementById('moreSpeedButton');
     if (button) {
         document.body.removeChild(button);
     }
@@ -188,7 +189,8 @@ function endRace(winner) {
 
     // Botão para voltar ao lobby
     const returnButton = document.createElement('button');
-    returnButton.textContent = 'Voltar ao Lobby';
+    returnButton.id = 'returnButton';
+    returnButton.textContent = 'Voltar ao Lobby (Q)';
     returnButton.style.position = 'absolute';
     returnButton.style.top = '60%';
     returnButton.style.left = '50%';
@@ -205,9 +207,16 @@ function endRace(winner) {
         document.body.removeChild(endMessage);
         document.body.removeChild(returnButton);
 
+        destroyMoreSPeedButton();
+
         const event = new Event('raceEnded');
         window.dispatchEvent(event);
+
+        window.removeEventListener('keydown', handleQKey);
     };
 
     document.body.appendChild(returnButton);
+
+    // Ativa o listener do Q só aqui, depois da corrida terminar
+    window.addEventListener('keydown', handleQKey);
 }

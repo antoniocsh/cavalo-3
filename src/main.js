@@ -366,6 +366,7 @@ async function init() {
             document.exitPointerLock();
             scene.remove(lobby);
             scene.add(raceAssets);
+
             startRaceButton.remove();
             startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
         }
