@@ -36,7 +36,7 @@ function generateFloor() {
 
 function wrapAndRepeatTexture(map) {
     map.wrapS = map.wrapT = THREE.RepeatWrapping
-    map.repeat.x = map.repeat.y = 250
+    map.repeat.x = map.repeat.y = 300
 }
 
 
@@ -119,17 +119,28 @@ async function init() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    directionalLight.position.set(10, 20, 10);
+    //make the light cast shadows
+
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(40, 50, 10);
     directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.near = 1;
+    directionalLight.shadow.camera.far = 100;
+    directionalLight.shadow.camera.left = -50;
+    directionalLight.shadow.camera.right = 50;
+    directionalLight.shadow.camera.top = 50;
+    directionalLight.shadow.camera.bottom = -50;
+
     scene.add(directionalLight);
 
 
+    
 
-
-
-    const axes = new THREE.AxesHelper(15);
-    scene.add(axes);
+    // const axes = new THREE.AxesHelper(15);
+    // scene.add(axes);
 
     let myHorse;
     let isMyHorseBusy = false;
@@ -147,6 +158,12 @@ async function init() {
         horseModel.scale.set(0.1, 0.1, 0.1);
         horseModel.position.set(0, 0, 0);
 
+        horseModel.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true; // Enable shadow casting
+                child.receiveShadow = true; // Enable shadow receiving
+            }
+        });
         // Attach model to the wrapper
         myHorse.add(horseModel);
 
@@ -160,32 +177,84 @@ async function init() {
     });
 
 
+
+
     let bot1;
 
     loader.load('models/horse.glb', (gltf) => {
         bot1 = gltf.scene;
         bot1.scale.set(0.1, 0.1, 0.1);
         bot1.position.set(0, -20, 0);
+        bot1.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true; // Enable shadow casting
+                child.receiveShadow = true; // Enable shadow receiving
+            }
+        });
+
         scene.add(bot1);
     });
 
+    // let bot2;
+
+    // loader.load('models/horse.glb', (gltf) => {
+    //     bot2 = gltf.scene;
+    //     bot2.scale.set(0.1, 0.1, 0.1);
+    //     bot2.position.set(0, -20, 0);
+    //     scene.add(bot2);
+    // });
+
+
     let bot2;
 
-    loader.load('models/horse.glb', (gltf) => {
+    loader.load('models/sea_horse.glb', (gltf) => {
         bot2 = gltf.scene;
-        bot2.scale.set(0.1, 0.1, 0.1);
-        bot2.position.set(0, -20, 0);
+        bot2.scale.set(3, 3, 3);
+        bot2.position.set(0, -20, 0); //1.5
+        bot2.rotation.y = -Math.PI / 2; // Adjust rotation if needed
+        bot2.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true; // Enable shadow casting
+                child.receiveShadow = true; // Enable shadow receiving
+            }
+        });
         scene.add(bot2);
     });
 
-    let bot3;
 
-    loader.load('models/horse.glb', (gltf) => {
+    // let bot3;
+
+    // loader.load('models/horse.glb', (gltf) => {
+    //     bot3 = gltf.scene;
+    //     bot3.scale.set(0.1, 0.1, 0.1);
+    //     bot3.position.set(0, -20, 0);
+    //     scene.add(bot3);
+    // });
+
+    let bot3;
+    loader.load('models/pegasus.glb', (gltf) => {
         bot3 = gltf.scene;
-        bot3.scale.set(0.1, 0.1, 0.1);
-        bot3.position.set(0, -20, 0);
+        bot3.scale.set(3.5, 3.5, 3.5);
+        bot3.position.set(0, -20, 0); //1.5
+        bot3.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true; // Enable shadow casting
+                child.receiveShadow = true; // Enable shadow receiving
+            }
+        });
         scene.add(bot3);
     });
+
+
+    // let pegasus;
+    // loader.load('models/pegasus.glb', (gltf) => {
+    //     pegasus = gltf.scene;
+    //     pegasus.scale.set(3.5, 3.5, 3.5);
+    //     pegasus.position.set(0, 3, 0);
+    //     scene.add(pegasus);
+    // });
+
+
 
 
     // const tower = createTower();
@@ -221,9 +290,11 @@ async function init() {
     document.addEventListener('click', () => {
         if (activeCamera === FPCamera) {
             document.body.requestPointerLock();
-        } else {
+        }
+        else {
             document.exitPointerLock();
         }
+
     });
 
     document.addEventListener('mousemove', (event) => {
@@ -272,30 +343,32 @@ async function init() {
         }
 
 
+        if (lobby.aquarium?.tick) lobby.aquarium.tick();
+
         renderer.render(scene, activeCamera);
     }
 
-    // Botão para alternar câmeras e estado do ponteiro
-    const toggleCamButton = document.createElement('button');
-    toggleCamButton.textContent = 'Alternar Câmera';
-    toggleCamButton.style.position = 'absolute';
-    toggleCamButton.style.top = '10px';
-    toggleCamButton.style.left = '10px';
-    toggleCamButton.style.padding = '10px';
-    toggleCamButton.style.background = 'black';
-    toggleCamButton.style.color = 'white';
-    toggleCamButton.style.border = 'none';
-    toggleCamButton.style.cursor = 'pointer';
-    toggleCamButton.onclick = () => {
-        activeCamera = activeCamera === FPCamera ? SceneCamera : FPCamera;
+    // // Botão para alternar câmeras e estado do ponteiro
+    // const toggleCamButton = document.createElement('button');
+    // toggleCamButton.textContent = 'Alternar Câmera';
+    // toggleCamButton.style.position = 'absolute';
+    // toggleCamButton.style.top = '10px';
+    // toggleCamButton.style.left = '10px';
+    // toggleCamButton.style.padding = '10px';
+    // toggleCamButton.style.background = 'black';
+    // toggleCamButton.style.color = 'white';
+    // toggleCamButton.style.border = 'none';
+    // toggleCamButton.style.cursor = 'pointer';
+    // toggleCamButton.onclick = () => {
+    //     activeCamera = activeCamera === FPCamera ? SceneCamera : FPCamera;
 
-        if (activeCamera === FPCamera) {
-            document.body.requestPointerLock();
-        } else {
-            document.exitPointerLock();
-        }
-    };
-    document.body.appendChild(toggleCamButton);
+    //     if (activeCamera === FPCamera) {
+    //         document.body.requestPointerLock();
+    //     } else {
+    //         document.exitPointerLock();
+    //     }
+    // };
+    // document.body.appendChild(toggleCamButton);
 
 
     // const morespeedButton = document.createElement('morespeedButton');
@@ -342,9 +415,9 @@ async function init() {
 
     // document.body.appendChild(startRaceButton);
     const startRaceButton = document.createElement('div');
-    startRaceButton.textContent = 'C - Começar Corrida';
+    startRaceButton.textContent = '(C) - Começar Corrida';
     startRaceButton.style.position = 'absolute';
-    startRaceButton.style.top = '50px';
+    startRaceButton.style.top = '10px';
     startRaceButton.style.left = '10px';
     startRaceButton.style.padding = '10px';
     startRaceButton.style.background = 'red';
@@ -357,7 +430,7 @@ async function init() {
 
     document.addEventListener('keydown', (event) => {
         keys[event.key.toLowerCase()] = true;
-    
+
         if (event.key.toLowerCase() === 'c' && !isMyHorseBusy) {
             myHorse.rotation.y = 0;
             myHorseCircle = 0;
@@ -371,7 +444,7 @@ async function init() {
             startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
         }
     });
-    
+
 
 
     window.addEventListener('raceEnded', () => {
@@ -389,6 +462,9 @@ async function init() {
 
         // Show race start button again
         document.body.appendChild(startRaceButton);
+        document.body.requestPointerLock();
+
+
     });
 
 

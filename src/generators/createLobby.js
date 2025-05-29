@@ -3,6 +3,7 @@ import { createRally } from './createFence.js';
 import { createHayBlock } from './createHayBlock.js';
 import { createFeeder } from './createFeeder.js';
 import { createTree } from './createTree.js';
+import { createAquarium } from './createAquarium.js';
 
 export async function createLobby(width, length) {
     const Lobby = new THREE.Object3D();
@@ -37,6 +38,19 @@ export async function createLobby(width, length) {
 
         Lobby.add(tree);
     }
+
+    const aquarium = await createAquarium();
+    aquarium.position.set(0, 0, -15);
+    Lobby.add(aquarium);
+    Lobby.aquarium = aquarium;
+
+    //make everything cast shadows
+    Lobby.traverse((child) => {
+        if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+        }
+    });
 
     return Lobby;
 }

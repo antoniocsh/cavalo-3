@@ -42,19 +42,19 @@ export async function startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEP
     const end = -RACEPOSITION_Z;
     bot1.position.set(RACEPOSITION_X + 3.5, 0.2, RACEPOSITION_Z);
     myHorse.position.set(RACEPOSITION_X + 10, 0.2, RACEPOSITION_Z);
-    bot2.position.set(RACEPOSITION_X + 16, 0.2, RACEPOSITION_Z);
-    bot3.position.set(RACEPOSITION_X + 22.5, 0.2, RACEPOSITION_Z);
+    bot2.position.set(RACEPOSITION_X + 16, 1.7, RACEPOSITION_Z);
+    bot3.position.set(RACEPOSITION_X + 22.5, 3.2, RACEPOSITION_Z);
 
     game321Counter();
     myHorseAccel = 1;
     let myHorseVelocity = 0.1;
     let bot1velocity = 0.1;
     let bot2velocity = 0.1;
-    let bot3velocity = 0.1;
+    let bot3velocity = 0.2;
 
     let bot1Acceleration = 1.2;
     let bot2Acceleration = 1.4;
-    let bot3Acceleration = 1.1;
+    let bot3Acceleration = 1.2;
 
     await sleep(4000);
 
@@ -190,7 +190,7 @@ function endRace(winner) {
     // Botão para voltar ao lobby
     const returnButton = document.createElement('button');
     returnButton.id = 'returnButton';
-    returnButton.textContent = 'Voltar ao Lobby (Q)';
+    returnButton.textContent = '(Q) - Voltar ao Lobby';
     returnButton.style.position = 'absolute';
     returnButton.style.top = '60%';
     returnButton.style.left = '50%';
