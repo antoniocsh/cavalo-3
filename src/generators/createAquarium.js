@@ -11,18 +11,15 @@ export function createAquarium() {
     const aquariumSize = { x: 10, y: 5, z: 5 };
 
 
-    //make it cast very light shadows
     const glassMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0xd9f2ff,
+        color: 0xe4f1f7,
         transparent: true,
         opacity: 0.15,
         roughness: 0,
-        metalness: 0,
+        metalness: 0.6,
         transmission: 1.0,
         clearcoat: 1.0,
         clearcoatRoughness: 0.1,
-        side: THREE.DoubleSide,
-        shadowSide: THREE.DoubleSide
     });
 
     const aquarium = new THREE.Group();
@@ -58,13 +55,12 @@ export function createAquarium() {
     aquarium.add(back);
 
     const waterMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0x70b8ff,
+        color: 0x1c4dff,
         transparent: true,
         opacity: 0.6,
         roughness: 0.1,
         metalness: 0.4,
         transmission: 1.0,
-        side: THREE.DoubleSide
     });
 
     const water = new THREE.Mesh(
