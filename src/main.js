@@ -7,6 +7,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { createRaceAssets } from './generators/createRaceAssets.js';
 import { startPegasusHunt } from './game_logic/pegasusHunt.js';
 
+import { createRomanTemple } from './generators/createRomanTemple.js';
 
 
 
@@ -110,13 +111,16 @@ async function init() {
     const lobby = await createLobby(FENCE_WIDTH, FENCE_LENGTH);
     scene.add(lobby);
 
+const temple = await createRomanTemple();
+//scene.add(temple);
+
     const raceAssets = await createRaceAssets(RACEPOSITION_X, RACEPOSITION_Z);
 
     // const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0));
     // const planeHelper = new THREE.PlaneHelper(plane, 200, 0x00ff00);
     // scene.add(planeHelper);
-
-    scene.add(generateFloor());
+    const grassfloor = generateFloor();
+    scene.add(grassfloor);
 
 
     // const light = new THREE.DirectionalLight(0xffffff, 6);
@@ -188,21 +192,51 @@ async function init() {
     let pegasusGameInstance = null;
 
     document.addEventListener('keydown', (event) => {
-        if (event.key.toLowerCase() === 'p' && !pegasusGameInstance) {
-            // Desativa o teu controlo de movimento e alterna camera
-            activeCamera = SceneCamera; // ou uma camera fixa
+        if (event.key.toLowerCase() === 'p' && !pegasusGameInstance && !isMyHorseBusy) {
+            isMyHorseBusy = true;
+            //retirar o meu cavalo 
+            if (myHorse) {
+                myHorse.position.set(0, -20, 0); // Retirar o cavalo do chão
+            }
+    
+            activeCamera = SceneCamera;
+            scene.remove(grassfloor);
+            scene.remove(lobby);
 
-            // Começa o jogo dos Pegasuses
+            scene.add(temple);
+
+            pegasusGameButton.remove();
+            startRaceButton.remove();
+    
             pegasusGameInstance = startPegasusHunt(scene, activeCamera, renderer, (finalPoints) => {
                 console.log(`Pegasus Game Ended with points: ${finalPoints}`);
                 pegasusGameInstance = null;
-                // Volta a ativar o teu controlo original e câmara, se quiseres
+                isMyHorseBusy = false;
+
+                // Restaurar os botoes
+                document.body.appendChild(pegasusGameButton);
+                document.body.appendChild(startRaceButton);
+
+                scene.remove(temple);
+    
+                // Restaurar chão   
+                scene.add(grassfloor);
+                // Restaurar lobby
+                scene.add(lobby);
+
+                // Restaurar o meu cavalo
+                if (myHorse) {
+                    myHorse.position.set(0, 0, 0); // Colocar o cavalo de volta no chão
+                    myHorse.rotation.set(0, 0, 0); // Resetar rotação
+                }
+    
+                // Voltar à câmara em primeira pessoa
                 activeCamera = FPCamera;
+                
             });
         }
     });
-
-
+    
 
 
     let bot1;
@@ -298,13 +332,13 @@ async function init() {
     scene.add(cameraHolder);
 
     // Câmera de cena com OrbitControls
-    const SceneCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX + 100);
-    SceneCamera.position.set(10, 10, 20);
-    const orbitControls = new OrbitControls(SceneCamera, document.body);
-    orbitControls.enableDamping = true;
+     const SceneCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, SKYBOX + 100);
+    SceneCamera.position.set( 27, 5, 0);
+    SceneCamera.lookAt(new THREE.Vector3(0, 3, 0));
+    // const orbitControls = new OrbitControls(SceneCamera, document.body);
+    // orbitControls.enableDamping = true;
 
     let activeCamera = FPCamera;
-
 
 
     let keys = {};
@@ -415,7 +449,7 @@ async function init() {
     function animate() {
         requestAnimationFrame(animate);
         updateCameraMovement();
-        orbitControls.update();
+        // orbitControls.update();
 
         if (myHorse && !isMyHorseBusy) {
             const radius = Math.min(FENCE_WIDTH, FENCE_LENGTH) * 1.5;
@@ -494,7 +528,20 @@ async function init() {
     //     startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
 
 
-
+    const pegasusGameButton = document.createElement('button');
+    pegasusGameButton.textContent = '(P) - Combater Pégasus';
+    pegasusGameButton.style.position = 'absolute';
+    pegasusGameButton.style.top = '50px';
+    pegasusGameButton.style.left = '10px';
+    pegasusGameButton.style.padding = '10px';
+    pegasusGameButton.style.background = 'blue';
+    pegasusGameButton.style.color = 'white';
+    pegasusGameButton.style.border = 'none';
+    pegasusGameButton.style.borderRadius = '8px';
+    pegasusGameButton.style.cursor = 'default';
+    pegasusGameButton.style.fontFamily = 'sans-serif';
+    pegasusGameButton.style.cursor = 'pointer';
+    document.body.appendChild(pegasusGameButton);
 
     // };
 
@@ -522,8 +569,10 @@ async function init() {
         document.exitPointerLock(); // Exit pointer lock mode
         scene.remove(lobby);
         scene.add(raceAssets);
+        
 
         startRaceButton.remove();
+        pegasusGameButton.remove();
         startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
     }
 
@@ -541,6 +590,8 @@ async function init() {
             scene.add(raceAssets);
 
             startRaceButton.remove();
+            pegasusGameButton.remove();
+
             startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
         }
     });
@@ -562,6 +613,7 @@ async function init() {
 
         // Show race start button again
         document.body.appendChild(startRaceButton);
+        document.body.appendChild(pegasusGameButton);
         // document.body.requestPointerLock();
 
 

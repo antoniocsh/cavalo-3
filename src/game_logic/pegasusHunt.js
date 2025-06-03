@@ -18,10 +18,16 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
     let infoDiv = document.createElement('div');
     infoDiv.style.position = 'absolute';
     infoDiv.style.top = '10px';
-    infoDiv.style.left = '10px';
+    infoDiv.style.left = '50%';
+    infoDiv.style.transform = 'translateX(-50%)';
     infoDiv.style.color = 'white';
-    infoDiv.style.fontSize = '20px';
+    infoDiv.style.fontSize = '24px';
     infoDiv.style.fontFamily = 'sans-serif';
+    infoDiv.style.textAlign = 'center';
+    infoDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    infoDiv.style.padding = '8px 16px';
+    infoDiv.style.borderRadius = '8px';
+
     document.body.appendChild(infoDiv);
 
 
@@ -35,7 +41,7 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
 
     loader.load('models/pegasus.glb', (gltf) => {
         pegasusModel = gltf.scene;
-        pegasusModel.scale.set(3.5, 3.5, 3.5);
+        pegasusModel.scale.set(3, 3, 3);
         pegasusModel.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;
@@ -54,13 +60,21 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
                 if (child.isMesh) {
                     child.material = child.material.clone();
                     child.material.color = new THREE.Color(0xff00b3);
+                    child.material.emissive = new THREE.Color(0xff00b3); // brilho rosa
+                    child.material.emissiveIntensity = 1;
                 }
             });
         }
         peg.position.set(
-            (Math.random() - 0.5) * 50,
-            Math.random() * 20 + 5,
-            (Math.random() - 0.5) * 50
+            // x: -20 to 10
+            Math.random() * 30 - 20, // x: -20 to 10
+            Math.random() * 12,         // y: 0 to 10
+            Math.random() * 24 - 12     // z: -10 to 10
+        );
+        peg.rotation.set(
+            Math.random() * Math.PI * 2,
+            Math.random() * Math.PI * 2,
+            Math.random() * Math.PI * 2
         );
         peg.userData = {
             isPink,
@@ -84,32 +98,38 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
     // Configura camera para fixa e parada
     const originalPosition = camera.position.clone();
     const originalRotation = camera.rotation.clone();
-    camera.position.set(0, 10, 30);
-    camera.lookAt(new THREE.Vector3(0, 10, 0));
 
 
     // Atualiza texto info
     function updateInfo() {
-        infoDiv.textContent = `Pontos: ${points}   Vidas: ${lives}`;
+        const hearts = '❤️'.repeat(lives);
+        infoDiv.innerHTML = `Pontos: <strong>${points}</strong> &nbsp;&nbsp; ${hearts}`;
     }
     updateInfo();
 
-    // Função para terminar o jogo
     function endGame() {
         gameActive = false;
-        infoDiv.textContent = `Fim de jogo! Pontos: ${points}`;
+        infoDiv.innerHTML = `<strong>Fim de jogo!</strong><br/>Pontos: ${points}`;
         // Limpar pegasus
         pegasusList.forEach(p => pegasusGroup.remove(p));
         pegasusList = [];
+
         // Remove info após algum tempo
         setTimeout(() => {
             if (infoDiv.parentElement) {
                 infoDiv.parentElement.removeChild(infoDiv);
             }
+
             // Retorna câmera ao estado original
             camera.position.copy(originalPosition);
             camera.rotation.copy(originalRotation);
+
             if (onGameEnd) onGameEnd(points);
+
+            // ✅ Disparar evento de término do jogo
+            const event = new Event('pegasusEnded');
+            window.dispatchEvent(event);
+
         }, 5000);
     }
 
@@ -135,9 +155,8 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
 
             // Chance de dar vida extra
             if (clickedPegasus.userData.isPink && lives < 3) {
-                if (Math.random() < 0.05) {
-                    lives += 1;
-                }
+                lives += 1;
+
             }
 
             updateInfo();
@@ -165,12 +184,23 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
             const p = pegasusList[i];
             // Movimento aleatório
             p.position.add(p.userData.velocity);
-            // Reflete se bater nas bordas +-25
-            ['x', 'y', 'z'].forEach(axis => {
-                if (p.position[axis] > 25 || p.position[axis] < -25) {
-                    p.userData.velocity[axis] *= -1;
-                }
-            });
+            // Reflete se bater nas bordas x > 49 ou x < -49, y > 20 ou y < 0, z > 15 ou z < -15
+            if (p.position.x > 10 || p.position.x < -20) {
+                p.userData.velocity.x *= -1;
+            }
+            if (p.position.y > 12 || p.position.y < 0) {
+                p.userData.velocity.y *= -1;
+            }
+            if (p.position.z > 13 || p.position.z < -13) {
+                p.userData.velocity.z *= -1;
+            }
+
+
+            // ['x', 'y', 'z'].forEach(axis => {
+            //     if (p.position[axis] > 25 || p.position[axis] < -25) {
+            //         p.userData.velocity[axis] *= -1;
+            //     }
+            // });
             // Checa tempo de vida
             if (now - p.userData.lifeStart > p.userData.lifeDuration) {
                 // Remove e perde vida
