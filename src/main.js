@@ -5,6 +5,8 @@ import { createLobby } from './generators/createLobby.js';
 import { startRace } from './game_logic/horseRace.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { createRaceAssets } from './generators/createRaceAssets.js';
+import { startPegasusHunt } from './game_logic/pegasusHunt.js';
+
 
 
 
@@ -54,6 +56,11 @@ function wrapAndRepeatTexture(map) {
 // }
 
 async function init() {
+    let yaw = 0;
+    let pitch = 0;
+
+    let mouseX = 0.5; // Normalizado (0 a 1)
+    let mouseY = 0.5; // Normalizado (0 a 1)
     const FENCE_WIDTH = 15;
     const FENCE_LENGTH = 15;
     const SKYBOX = 700;
@@ -137,7 +144,7 @@ async function init() {
     scene.add(directionalLight);
 
 
-    
+
 
     // const axes = new THREE.AxesHelper(15);
     // scene.add(axes);
@@ -162,6 +169,8 @@ async function init() {
             if (child.isMesh) {
                 child.castShadow = true; // Enable shadow casting
                 child.receiveShadow = true; // Enable shadow receiving
+                // child.material.color.set(new THREE.Color(0xff00b3));  // Ou: new THREE.Color(0xff00b3)
+
             }
         });
         // Attach model to the wrapper
@@ -174,6 +183,23 @@ async function init() {
 
         myHorse.add(myHorseCamera);
         scene.add(myHorse);
+    });
+
+    let pegasusGameInstance = null;
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key.toLowerCase() === 'p' && !pegasusGameInstance) {
+            // Desativa o teu controlo de movimento e alterna camera
+            activeCamera = SceneCamera; // ou uma camera fixa
+
+            // Começa o jogo dos Pegasuses
+            pegasusGameInstance = startPegasusHunt(scene, activeCamera, renderer, (finalPoints) => {
+                console.log(`Pegasus Game Ended with points: ${finalPoints}`);
+                pegasusGameInstance = null;
+                // Volta a ativar o teu controlo original e câmara, se quiseres
+                activeCamera = FPCamera;
+            });
+        }
     });
 
 
@@ -263,7 +289,13 @@ async function init() {
 
     // Câmera em primeira pessoa
     const FPCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX + 100);
-    FPCamera.position.set(0, 4, 15);
+    FPCamera.position.set(0, 0, 0); // zera a posição dentro do holder
+
+    // Suporte da câmera que permite rotação vertical (pitch)
+    const cameraHolder = new THREE.Object3D();
+    cameraHolder.position.set(0, 4, 15); // posição inicial da câmera
+    cameraHolder.add(FPCamera);
+    scene.add(cameraHolder);
 
     // Câmera de cena com OrbitControls
     const SceneCamera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, SKYBOX + 100);
@@ -275,7 +307,6 @@ async function init() {
 
 
 
-    let yaw = 0;
     let keys = {};
     const speed = 0.2;
 
@@ -287,29 +318,81 @@ async function init() {
         keys[event.key.toLowerCase()] = false;
     });
 
-    document.addEventListener('click', () => {
-        if (activeCamera === FPCamera) {
-            document.body.requestPointerLock();
-        }
-        else {
-            document.exitPointerLock();
-        }
+    // document.addEventListener('click', () => {
+    //     if (activeCamera === FPCamera) {
+    //         document.body.requestPointerLock();
+    //     }
+    //     else {
+    //         document.exitPointerLock();
+    //     }
 
+    // });
+
+    // document.addEventListener('mousemove', (event) => {
+    //     if (document.pointerLockElement === document.body && activeCamera === FPCamera) {
+    //         const sensitivity = 0.002;
+    //         yaw -= event.movementX * sensitivity;
+    //         FPCamera.rotation.set(0, yaw, 0);
+    //     }
+    // });
+    document.addEventListener('mousemove', (event) => {
+        mouseX = event.clientX / window.innerWidth;
+        mouseY = event.clientY / window.innerHeight;
     });
 
-    document.addEventListener('mousemove', (event) => {
-        if (document.pointerLockElement === document.body && activeCamera === FPCamera) {
-            const sensitivity = 0.002;
-            yaw -= event.movementX * sensitivity;
-            FPCamera.rotation.set(0, yaw, 0);
+
+    window.addEventListener('resize', () => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        renderer.setSize(width, height);
+
+        FPCamera.aspect = width / height;
+        FPCamera.updateProjectionMatrix();
+
+        SceneCamera.aspect = width / height;
+        SceneCamera.updateProjectionMatrix();
+
+        if (myHorseCamera) {
+            myHorseCamera.aspect = width / height;
+            myHorseCamera.updateProjectionMatrix();
         }
     });
 
     function updateCameraMovement() {
         if (activeCamera !== FPCamera) return;
+
         const direction = new THREE.Vector3();
         const right = new THREE.Vector3();
 
+        const centerX = 0.5;
+        const centerY = 0.5;
+        const deltaX = mouseX - centerX;
+        const deltaY = mouseY - centerY;
+
+        const deadZone = 0.10;       // Tamanho da zona morta no centro do ecrã
+        const rotationSpeed = 0.1;   // Velocidade da rotação
+
+        // Atualiza yaw apenas fora da zona morta
+        if (Math.abs(deltaX) > deadZone) {
+            yaw -= (deltaX - Math.sign(deltaX) * deadZone) * rotationSpeed;
+        }
+
+        // Atualiza pitch com limite, apenas fora da zona morta
+        if (Math.abs(deltaY) > deadZone) {
+            pitch -= (deltaY - Math.sign(deltaY) * deadZone) * rotationSpeed;
+
+            // Limites do pitch (evita virar ao contrário)
+            const maxPitch = Math.PI / 2 - 0.01;
+            const minPitch = -Math.PI / 2 + 0.01;
+            pitch = Math.max(minPitch, Math.min(maxPitch, pitch));
+        }
+
+        // Aplica as rotações
+        cameraHolder.rotation.set(0, yaw, 0);
+        FPCamera.rotation.set(pitch, 0, 0);
+
+        // Movimento
         FPCamera.getWorldDirection(direction);
         direction.y = 0;
         direction.normalize();
@@ -323,9 +406,11 @@ async function init() {
 
         if (moveDirection.length() > 0) {
             moveDirection.normalize();
-            FPCamera.position.addScaledVector(moveDirection, speed);
+            cameraHolder.position.addScaledVector(moveDirection, speed);
         }
     }
+
+
 
     function animate() {
         requestAnimationFrame(animate);
@@ -414,7 +499,7 @@ async function init() {
     // };
 
     // document.body.appendChild(startRaceButton);
-    const startRaceButton = document.createElement('div');
+    const startRaceButton = document.createElement('button');
     startRaceButton.textContent = '(C) - Começar Corrida';
     startRaceButton.style.position = 'absolute';
     startRaceButton.style.top = '10px';
@@ -426,7 +511,22 @@ async function init() {
     startRaceButton.style.borderRadius = '8px';
     startRaceButton.style.cursor = 'default';
     startRaceButton.style.fontFamily = 'sans-serif';
+    startRaceButton.style.cursor = 'pointer';
     document.body.appendChild(startRaceButton);
+
+    startRaceButton.onclick = () => {
+        myHorse.rotation.y = 0;
+        myHorseCircle = 0;
+        isMyHorseBusy = true;
+        activeCamera = myHorseCamera; // Switch to horse camera
+        document.exitPointerLock(); // Exit pointer lock mode
+        scene.remove(lobby);
+        scene.add(raceAssets);
+
+        startRaceButton.remove();
+        startRace(myHorse, bot1, bot2, bot3, RACEPOSITION_X, RACEPOSITION_Z);
+    }
+
 
     document.addEventListener('keydown', (event) => {
         keys[event.key.toLowerCase()] = true;
@@ -436,7 +536,7 @@ async function init() {
             myHorseCircle = 0;
             isMyHorseBusy = true;
             activeCamera = myHorseCamera;
-            document.exitPointerLock();
+            // document.exitPointerLock();
             scene.remove(lobby);
             scene.add(raceAssets);
 
@@ -462,7 +562,7 @@ async function init() {
 
         // Show race start button again
         document.body.appendChild(startRaceButton);
-        document.body.requestPointerLock();
+        // document.body.requestPointerLock();
 
 
     });
@@ -474,3 +574,5 @@ async function init() {
 
 
 window.onload = init;
+
+

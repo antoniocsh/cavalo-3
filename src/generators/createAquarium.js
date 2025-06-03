@@ -11,7 +11,7 @@ export function createAquarium() {
     const aquariumSize = { x: 10, y: 5, z: 5 };
 
 
-    const glassMaterial = new THREE.MeshPhysicalMaterial({
+    const glassMaterial = new THREE.MeshStandardMaterial({
         color: 0xe4f1f7,
         transparent: true,
         opacity: 0.15,
@@ -54,8 +54,8 @@ export function createAquarium() {
     back.position.z *= -1;
     aquarium.add(back);
 
-    const waterMaterial = new THREE.MeshPhysicalMaterial({
-        color: 0x1c4dff,
+    const waterMaterial = new THREE.MeshStandardMaterial({
+        color: 0x3399ff,
         transparent: true,
         opacity: 0.6,
         roughness: 0.1,
