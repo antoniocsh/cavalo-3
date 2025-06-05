@@ -1,12 +1,31 @@
-# React + Vite
+# Cavalo-3
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cavalo Normal:
+https://sketchfab.com/3d-models/horse-e9f1f7d5684c4e8881eb24a1d57e71b3
 
-Currently, two official plugins are available:
+Cavalo Marinho: 
+https://sketchfab.com/3d-models/sea-horse-c10d03529a844dac82b38d1dc24a037d
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Pegasus:
+https://sketchfab.com/3d-models/winged-horse-with-fiery-mane-1542cfd218744fb39560635a367ec4a3
 
-## Expanding the ESLint configuration
+Arvore:
+https://sketchfab.com/3d-models/giant-low-poly-tree-acfd2b7f80894848b56c2ac8e7e59572
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Coluna Grega:
+https://sketchfab.com/3d-models/greek-underwater-column-4-899b6237315d4c608b4323a598065be4
+
+Witch Hat:
+https://sketchfab.com/3d-models/low-poly-witch-hat-1e2836e1bfd04b1ab87a909d3a4e1b24
+
+Crown:
+https://sketchfab.com/3d-models/simple-low-poly-crown-e2462871cc894914adbdb8722838c3b0#download
+
+Hat:
+https://sketchfab.com/3d-models/low-poly-game-ready-simple-cap-88df93aa1149433888937a72748eeda0#download
+
+Witch Broom:
+https://sketchfab.com/3d-models/witches-broom-f0512795f99446739905a8f6e41b837c#download
+
+Sword:
+https://sketchfab.com/3d-models/low-poly-sword-011bf47221c24382b6717b0ee2df8816#download
