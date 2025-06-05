@@ -31,11 +31,9 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
     document.body.appendChild(infoDiv);
 
 
-    // Criar Raycaster para clique
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    // Pegasus modelo cache
     let pegasusModel = null;
     let pegasusModelLoaded = false;
 
@@ -51,7 +49,6 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
         pegasusModelLoaded = true;
     });
 
-    // Função para criar um Pegasus
     function createPegasus(isPink = false) {
         if (!pegasusModelLoaded) return null;
         const peg = pegasusModel.clone(true);
@@ -72,9 +69,7 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
             Math.random() * 24 - 12     // z: -10 to 10
         );
         peg.rotation.set(
-            Math.random() * Math.PI * 2,
-            Math.random() * Math.PI * 2,
-            Math.random() * Math.PI * 2
+            0,Math.PI/2,0
         );
         peg.userData = {
             isPink,
@@ -91,16 +86,13 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
         return peg;
     }
 
-    // Cria novo Pegasus a cada ~1 segundo
     let lastSpawnTime = 0;
     const spawnInterval = 1000;
 
-    // Configura camera para fixa e parada
     const originalPosition = camera.position.clone();
     const originalRotation = camera.rotation.clone();
 
 
-    // Atualiza texto info
     function updateInfo() {
         const hearts = '❤️'.repeat(lives);
         infoDiv.innerHTML = `Pontos: <strong>${points}</strong> &nbsp;&nbsp; ${hearts}`;
@@ -110,50 +102,41 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
     function endGame() {
         gameActive = false;
         infoDiv.innerHTML = `<strong>Fim de jogo!</strong><br/>Pontos: ${points}`;
-        // Limpar pegasus
         pegasusList.forEach(p => pegasusGroup.remove(p));
         pegasusList = [];
 
-        // Remove info após algum tempo
         setTimeout(() => {
             if (infoDiv.parentElement) {
                 infoDiv.parentElement.removeChild(infoDiv);
             }
 
-            // Retorna câmera ao estado original
             camera.position.copy(originalPosition);
             camera.rotation.copy(originalRotation);
 
             if (onGameEnd) onGameEnd(points);
 
-            // ✅ Disparar evento de término do jogo
             const event = new Event('pegasusEnded');
             window.dispatchEvent(event);
 
         }, 5000);
     }
 
-    // Click handler para destruir Pegasus
     function onClick(event) {
         if (!gameActive) return;
-        // Calcula coordenadas normalizadas do mouse
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObjects(pegasusGroup.children, true);
 
         if (intersects.length > 0) {
-            // Descobre o Pegasus clicado (objeto mais próximo)
             let clickedPegasus = intersects[0].object;
             while (clickedPegasus.parent && clickedPegasus.parent !== pegasusGroup) {
                 clickedPegasus = clickedPegasus.parent;
             }
-            // Remove Pegasus
             pegasusGroup.remove(clickedPegasus);
             pegasusList = pegasusList.filter(p => p !== clickedPegasus);
             points += 1;
 
-            // Chance de dar vida extra
             if (clickedPegasus.userData.isPink && lives < 3) {
                 lives += 1;
 
@@ -165,13 +148,11 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
 
     window.addEventListener('click', onClick);
 
-    // Atualização do jogo
     function update() {
         if (!gameActive) return;
 
         const now = performance.now();
 
-        // Spawn novo Pegasus
         if (now - lastSpawnTime > spawnInterval && pegasusModelLoaded) {
             lastSpawnTime = now;
             // 5% chance de ser rosa
@@ -179,12 +160,9 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
             createPegasus(isPink);
         }
 
-        // Atualiza posições dos Pegasuses e verifica tempo de vida
         for (let i = pegasusList.length - 1; i >= 0; i--) {
             const p = pegasusList[i];
-            // Movimento aleatório
             p.position.add(p.userData.velocity);
-            // Reflete se bater nas bordas x > 49 ou x < -49, y > 20 ou y < 0, z > 15 ou z < -15
             if (p.position.x > 10 || p.position.x < -20) {
                 p.userData.velocity.x *= -1;
             }
@@ -196,12 +174,6 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
             }
 
 
-            // ['x', 'y', 'z'].forEach(axis => {
-            //     if (p.position[axis] > 25 || p.position[axis] < -25) {
-            //         p.userData.velocity[axis] *= -1;
-            //     }
-            // });
-            // Checa tempo de vida
             if (now - p.userData.lifeStart > p.userData.lifeDuration) {
                 // Remove e perde vida
                 pegasusGroup.remove(p);
@@ -216,7 +188,6 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
         }
     }
 
-    // Loop de animação dedicado
     function animate() {
         if (!gameActive) return;
         requestAnimationFrame(animate);
@@ -225,7 +196,6 @@ export function startPegasusHunt(scene, camera, renderer, onGameEnd) {
     }
     animate();
 
-    // Retorna função para terminar manualmente, se necessário
     return {
         stop: () => {
             gameActive = false;

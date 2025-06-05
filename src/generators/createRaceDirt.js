@@ -24,8 +24,8 @@ export function createRaceDirt() {
 
     const stripeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
     const stripeWidth = 0.05;     // altura (evitar clipping)
-    const stripeThickness = 1;    // espessura da faixa no eixo X
-    const stripeLength = 500;     // comprimento da faixa no eixo Y
+    const stripeThickness = 1;    
+    const stripeLength = 500;    
     const stripeGeometry = new THREE.BoxGeometry(stripeThickness, stripeWidth, stripeLength);
 
     for (let x = 0; x <= 25; x += 25/4) {

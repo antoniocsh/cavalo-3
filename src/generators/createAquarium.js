@@ -16,10 +16,7 @@ export function createAquarium() {
         transparent: true,
         opacity: 0.15,
         roughness: 0,
-        metalness: 0.6,
-        transmission: 1.0,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
+        metalness: 0.6
     });
 
     const aquarium = new THREE.Group();
@@ -59,9 +56,7 @@ export function createAquarium() {
         transparent: true,
         opacity: 0.6,
         roughness: 0.1,
-        metalness: 0.4,
-        transmission: 1.0,
-    });
+        metalness: 0.4    });
 
     const water = new THREE.Mesh(
         new THREE.BoxGeometry(aquariumSize.x - wallThickness * 2, aquariumSize.y*0.8, aquariumSize.z - wallThickness * 2),

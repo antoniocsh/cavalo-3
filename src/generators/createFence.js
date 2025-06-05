@@ -84,12 +84,11 @@ function createHorizontalPart(width, height, orientation = 0){
 
 export function createRally(width, length) {
     const rally = new THREE.Object3D();
-    const fenceSpacing = 3.5; // Espaçamento entre as cercas
+    const fenceSpacing = 3.5; 
 
     const centerX = (width * fenceSpacing) / 2;
     const centerZ = (length * fenceSpacing) / 2;
 
-    // Criar cercas para as bordas do cercado
     for (let i = 0; i < width; i++) {
         const fence1 = createFence(i * fenceSpacing - centerX, -centerZ, 0); // Linha superior
         const fence2 = createFence(i * fenceSpacing - centerX, length * fenceSpacing - centerZ, 0); // Linha inferior
@@ -104,7 +103,6 @@ export function createRally(width, length) {
         rally.add(fence2);
     }
 
-    // Adicionar a última parte vertical no canto final
     const lastVerticalPart = createVerticalPart(0.5, 3);
     lastVerticalPart.position.set(width * fenceSpacing - centerX, 1.5, length * fenceSpacing - centerZ);
     rally.add(lastVerticalPart);

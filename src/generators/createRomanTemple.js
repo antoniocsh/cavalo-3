@@ -6,16 +6,13 @@ export async function createRomanTemple() {
 
     const textureLoader = new THREE.TextureLoader();
 
-    // Textura ruinosa para beams e demais partes
     const ruinTexture = textureLoader.load('textures/ruinas2.png');
     wrapAndRepeatTexture(ruinTexture);
 
-    // Material beams com textura ruinosa e repeat diferente
     const beamTexture = textureLoader.load('textures/ruinas2.png');
     wrapAndRepeatTextureBeams(beamTexture);
     const beamMaterial = new THREE.MeshStandardMaterial({ map: beamTexture });
 
-    // Textura do chão roman_floor.png
     const floorTexture = textureLoader.load('textures/roman_floor.png');
     wrapAndRepeatTextureFloor(floorTexture);
     const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
@@ -61,7 +58,6 @@ export async function createRomanTemple() {
     placeColumnsLine(-depth / 2 + spacingZ, numColumnsSide - 2, 'z', 0, -width / 2);
     // placeColumnsLine(-depth / 2 + spacingZ, numColumnsSide - 2, 'z', 0, width / 2);
 
-    // Piso com textura roman_floor.png
     const floorGeometry = new THREE.PlaneGeometry(width + 20, depth + 20);
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
@@ -69,7 +65,6 @@ export async function createRomanTemple() {
     floor.receiveShadow = true;
     temple.add(floor);
 
-    // Beams usando beamMaterial (textura ruinosa com repeat diferente)
     const beamGeometry = new THREE.BoxGeometry(width + spacingX, 1.5, 2);
     const frontBeam = new THREE.Mesh(beamGeometry, beamMaterial);
     frontBeam.position.set(0, 9, -depth / 2);
@@ -84,7 +79,6 @@ export async function createRomanTemple() {
     rightBeam.position.x = width / 2;
     temple.add(leftBeam, rightBeam);
 
-    // Frontões laterais continuam com textura ruinosa original
     const sideShape = new THREE.Shape();
     sideShape.moveTo(-depth / 2, 0);
     sideShape.lineTo(0, 3);
@@ -112,7 +106,6 @@ export async function createRomanTemple() {
 
     return temple;
 
-    // add orbit controls camera in pilar in width/2,3,0 pointing to 0,3,0
     
 }
 
@@ -128,5 +121,5 @@ function wrapAndRepeatTextureBeams(map) {
 
 function wrapAndRepeatTextureFloor(map) {
     map.wrapS = map.wrapT = THREE.RepeatWrapping;
-    map.repeat.set(20, 20);  // mais tileado no chão, ajusta como quiser
+    map.repeat.set(20, 20);  
 }

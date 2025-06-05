@@ -4,7 +4,6 @@ import * as THREE from 'three';
 let animationFrameId;
 let myHorseAccel = 1;
 
-// Listener para barra de espaço (sempre ativo)
 function handleSpaceKey(event) {
     if (event.code === 'Space') {
         if (myHorseAccel <= 1.5) {
@@ -19,7 +18,6 @@ function handleSpaceKey(event) {
 }
 window.addEventListener('keydown', handleSpaceKey);
 
-// Listener para a tecla Q (apenas após a corrida acabar)
 function handleQKey(event) {
     if (event.key.toLowerCase() === 'q') {
         const endMessage = document.querySelector('div[style*="top: 40%"]');
@@ -168,7 +166,6 @@ function destroyMoreSPeedButton() {
 }
 
 function endRace(winner) {
-    // Mensagem de fim da corrida
     const endMessage = document.createElement('div');
     endMessage.style.position = 'absolute';
     endMessage.style.top = '40%';
@@ -182,6 +179,7 @@ function endRace(winner) {
     endMessage.style.borderRadius = '10px';
     endMessage.style.textAlign = 'center';
     if (winner === 'player') {
+        addHorseCoins(100);
         endMessage.textContent = '🏁 PARABÉNS! VENCESTE! 🏆';
     }
     else{endMessage.textContent = `🏁 Vencedor: ${winner}!`;}
@@ -217,6 +215,10 @@ function endRace(winner) {
 
     document.body.appendChild(returnButton);
 
-    // Ativa o listener do Q só aqui, depois da corrida terminar
     window.addEventListener('keydown', handleQKey);
+}
+
+function addHorseCoins(amount) {
+    const current = parseInt(localStorage.getItem('horsecoin')) || 0;
+    localStorage.setItem('horsecoin', current + amount);
 }

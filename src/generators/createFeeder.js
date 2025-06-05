@@ -116,7 +116,7 @@ const waterMaterial = new THREE.MeshStandardMaterial({
 
 const waterGeometry = new THREE.BoxGeometry(4.8, 0.9, 1.8); // largura, altura, profundidade
 const water = new THREE.Mesh(waterGeometry, waterMaterial);
-water.position.set(2.7, 0.8, 0); // centralizado dentro do feeder, ajustado em Y para parecer "cheio"
+water.position.set(2.7, 0.8, 0); 
 
 feeder.add(water);
 
